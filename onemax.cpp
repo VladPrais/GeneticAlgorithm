@@ -88,7 +88,7 @@ void mutation(vector<individual> &offspring, double MTPB, double MGPB)
         }
 }
 
-double stat(vector<individual> &pop)
+vector<double> stat(vector<individual> &pop)
 {
         int pop_size = pop.size();
         double min = pop[0].fitness, max = pop[0].fitness, avg = pop[0].fitness;
@@ -100,7 +100,11 @@ double stat(vector<individual> &pop)
         }
         avg /= pop_size;
         cout << min << '\t' << max << '\t' << avg << endl;
-	return max;
+	vector<double> stat;
+	stat.push_back(min);
+	stat.push_back(max);
+
+	return stat;
 }
 
 double evalute(individual &individ)
@@ -125,8 +129,7 @@ void compute_fitness(vector<individual> &population)
 
 int main(void)
 {
-        int eras = 500;
-        int len_genes = 100, pop_size = 2000, tournsize = 3;
+        int max_eras = 1000, len_genes = 100, pop_size = 300, tournsize = 3;
         double CXPB = 0.7, MTPB = 0.2, MGPB = 0.001;
 
         uniform_int_distribution zero_or_one(0, 1);
@@ -145,14 +148,16 @@ int main(void)
         cout << "era\tmin\tmax\tavg" << endl;
         cout << 0 << '\t';
         stat(population);
+	double min = 0, max = 0;
 
-	for(int g = 1; g < eras + 1; g++){
+	for(int g = 1; g < max_eras + 1; g++){
 		population = tournament(population, tournsize);
 		crossover(population, CXPB);
 		mutation(population, MTPB, MGPB);
 		compute_fitness(population);
 		cout << g << '\t';
-		double max = stat(population);
+		max = stat(population)[1];
+
 		if(max == len_genes)
 			break;
 	}
